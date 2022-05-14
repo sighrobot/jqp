@@ -1,0 +1,19 @@
+{
+  "name": "jq-proxy",
+  "version": "1.0.0",
+  "repository": "git@github.com:sighrobot/jq-proxy.git",
+  "author": "Abe Rubenstein <sighrobot@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "next": "^12.1.6",
+    "node-jq": "^2.3.3",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  }
+}
