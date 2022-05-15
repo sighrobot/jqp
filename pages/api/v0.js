@@ -35,21 +35,23 @@ async function handler(req, res) {
     missingParams.push('jq');
   }
   if (missingParams.length > 0) {
-    fail(`missing query parameters: [${missingParams.join(', ')}]`);
+    return fail(`missing query parameters: [${missingParams.join(', ')}]`);
   }
 
   let fetched;
   try {
     fetched = await fetch(url);
   } catch {
-    fail('fetch failed: check that URL is valid and properly encoded.');
+    return fail('fetch failed: check that URL is valid and properly encoded.');
   }
 
   let rawJSON;
   try {
     rawJSON = await fetched.json();
   } catch {
-    fail('JSON parse failed: check that original response is valid JSON.');
+    return fail(
+      'JSON parse failed: check that original response is valid JSON.',
+    );
   }
 
   let filteredJSON;
@@ -59,12 +61,12 @@ async function handler(req, res) {
       output: 'json',
     });
   } catch {
-    fail(
+    return fail(
       'node-jq failed: check that filter expression is valid and properly encoded.',
     );
   }
 
-  res
+  return res
     .status(200)
     .json(
       debug === 'true'
