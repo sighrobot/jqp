@@ -1,10 +1,9 @@
 const jq = require('node-jq');
+const { version } = require('../../package.json');
 
 const allowCors = (fn) => async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  // another common pattern
-  // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
   res.setHeader(
     'Access-Control-Allow-Methods',
     'GET,OPTIONS,PATCH,DELETE,POST,PUT',
@@ -26,7 +25,6 @@ const makeFailFunction = (req, res) => (error) => {
 
 async function handler(req, res) {
   const fail = makeFailFunction(req, res);
-
   const { url, jq: filter, debug } = req.query;
 
   const missingParams = [];
@@ -54,7 +52,7 @@ async function handler(req, res) {
     fail('JSON parse failed: check that original response is valid JSON.');
   }
 
-  let filteredJSON = {};
+  let filteredJSON;
   try {
     filteredJSON = await jq.run(filter, rawJSON, {
       input: 'json',
@@ -70,7 +68,7 @@ async function handler(req, res) {
     .status(200)
     .json(
       debug === 'true'
-        ? { query: req.query, output: filteredJSON }
+        ? { version, query: req.query, output: filteredJSON }
         : filteredJSON,
     );
 }
