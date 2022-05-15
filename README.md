@@ -1,6 +1,4 @@
-# jqp
-
-_[in development]_
+# jqp ![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square)
 
 ## Summary
 
