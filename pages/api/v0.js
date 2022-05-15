@@ -20,48 +20,59 @@ const allowCors = (fn) => async (req, res) => {
   return await fn(req, res);
 };
 
+const makeFailFunction = (req, res) => (error) => {
+  res.status(500).json({ error, query: req.query });
+};
+
 async function handler(req, res) {
+  const fail = makeFailFunction(req, res);
+
   const { url, jq: filter, debug } = req.query;
 
   const missingParams = [];
-
   if (!url) {
     missingParams.push('url');
   }
-
   if (!filter) {
     missingParams.push('jq');
   }
-
   if (missingParams.length > 0) {
-    return res.status(500).json({
-      error: `Missing query parameters: [${missingParams.join(', ')}]`,
-    });
+    fail(`missing query parameters: [${missingParams.join(', ')}]`);
   }
 
-  const fetched = await fetch(url);
-  const rawJSON = await fetched.json();
+  let fetched;
+  try {
+    fetched = await fetch(url);
+  } catch {
+    fail('fetch failed: check that URL is valid and properly encoded.');
+  }
+
+  let rawJSON;
+  try {
+    rawJSON = await fetched.json();
+  } catch {
+    fail('JSON parse failed: check that original response is valid JSON.');
+  }
 
   let filteredJSON = {};
-
   try {
     filteredJSON = await jq.run(filter, rawJSON, {
       input: 'json',
       output: 'json',
     });
-  } catch (error) {
-    res.status(500).json({
-      query: { url, jq: filter },
-      error: 'jq failed: check that the filter expression is well-formed.',
-    });
+  } catch {
+    fail(
+      'node-jq failed: check that filter expression is valid and properly encoded.',
+    );
   }
 
-  const payload =
-    debug === 'true'
-      ? { query: { url, jq: filter }, output: filteredJSON }
-      : filteredJSON;
-
-  res.status(200).json(payload);
+  res
+    .status(200)
+    .json(
+      debug === 'true'
+        ? { query: req.query, output: filteredJSON }
+        : filteredJSON,
+    );
 }
 
 module.exports = allowCors(handler);
