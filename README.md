@@ -1,10 +1,10 @@
-# jq-proxy
+# jqp
 
 _[in development]_
 
 ## Summary
 
-`jq-proxy` is a super simple serverless proxy that lets you request JSON data from a third-party source, filter it using [`node-jq`](https://github.com/sanack/node-jq), and receive the filtered response.
+`jqp` is a super simple serverless proxy that lets you request JSON data from a third-party source, filter it using [`node-jq`](https://github.com/sanack/node-jq), and receive the filtered response.
 
 ## How to use
 
