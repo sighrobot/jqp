@@ -1,4 +1,6 @@
 const jq = require('node-jq');
+const Papa = require('papaparse');
+
 const { version } = require('../../package.json');
 
 const allowCors = (fn) => async (req, res) => {
@@ -19,12 +21,19 @@ const allowCors = (fn) => async (req, res) => {
   return await fn(req, res);
 };
 
-const makeFailFunction = (req, res) => (error) => {
-  res.status(500).json({ error, query: req.query });
-};
+function maybeParse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return Papa.parse(text, { header: true, skipEmptyLines: true }).data;
+  }
+}
 
 async function handler(req, res) {
-  const fail = makeFailFunction(req, res);
+  const fail = (error) => {
+    res.status(500).json({ error, query: req.query });
+  };
+
   const { url, jq: filter, debug } = req.query;
 
   const missingParams = [];
@@ -38,19 +47,20 @@ async function handler(req, res) {
     return fail(`missing query parameters: [${missingParams.join(', ')}]`);
   }
 
-  let fetched;
+  let text;
   try {
-    fetched = await fetch(url);
+    const fetched = await fetch(url);
+    text = await fetched.text();
   } catch {
     return fail('fetch failed: check that URL is valid and properly encoded.');
   }
 
   let rawJSON;
   try {
-    rawJSON = await fetched.json();
+    rawJSON = maybeParse(text);
   } catch {
     return fail(
-      'JSON parse failed: check that original response is valid JSON.',
+      'parse failed: check that original response is valid JSON or CSV.',
     );
   }
 
