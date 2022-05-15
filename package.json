@@ -1,6 +1,6 @@
 {
   "name": "jq-proxy",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "repository": "git@github.com:sighrobot/jq-proxy.git",
   "author": "Abe Rubenstein <sighrobot@gmail.com>",
   "license": "MIT",
