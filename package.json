@@ -1,7 +1,8 @@
 {
-  "name": "jq-proxy",
+  "name": "jqp",
+  "description": "A serverless proxy for filtering JSON using node-jq",
   "version": "0.1.0",
-  "repository": "git@github.com:sighrobot/jq-proxy.git",
+  "repository": "git@github.com:sighrobot/jqp.git",
   "author": "Abe Rubenstein <sighrobot@gmail.com>",
   "license": "MIT",
   "dependencies": {
