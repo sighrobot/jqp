@@ -30,8 +30,8 @@ function maybeParse(text) {
 }
 
 async function handler(req, res) {
-  const fail = (error) => {
-    res.status(500).json({ error, query: req.query });
+  const fail = (error, code = 500) => {
+    res.status(code).json({ error, query: req.query });
   };
 
   const { url, jq: filter, debug } = req.query;
@@ -41,44 +41,49 @@ async function handler(req, res) {
     missingParams.push('url');
   }
   if (missingParams.length > 0) {
-    return fail(`missing query parameters: [${missingParams.join(', ')}]`);
+    return fail(`missing query parameters: [${missingParams.join(', ')}]`, 400);
   }
 
-  let text;
+  const urls = Array.isArray(url) ? url : [url];
+
+  let texts;
   try {
-    const fetched = await fetch(url);
-    text = await fetched.text();
+    const fetched = await Promise.all(urls.map((u) => fetch(u)));
+    texts = await Promise.all(fetched.map((f) => f.text()));
   } catch {
-    return fail('fetch failed: check that URL is valid and properly encoded.');
+    return fail(
+      'fetch failed: check that URL(s) are valid and properly encoded.',
+    );
   }
 
-  let json;
+  let inputJsons;
   try {
-    json = maybeParse(text);
+    inputJsons = texts.map(maybeParse);
   } catch {
     return fail(
       'parse failed: check that original response is valid JSON or CSV.',
     );
   }
 
-  if (filter) {
-    try {
-      json = await jq.run(filter, json, {
+  let output;
+  try {
+    output = await jq.run(
+      filter ?? '.',
+      inputJsons.length > 1 ? inputJsons : inputJsons[0],
+      {
         input: 'json',
         output: 'json',
-      });
-    } catch {
-      return fail(
-        'node-jq failed: check that filter expression is valid and properly encoded.',
-      );
-    }
+      },
+    );
+  } catch {
+    return fail(
+      'node-jq failed: check that filter expression is valid and properly encoded.',
+    );
   }
 
   return res
     .status(200)
-    .json(
-      debug === 'true' ? { version, query: req.query, output: json } : json,
-    );
+    .json(debug === 'true' ? { version, query: req.query, output } : output);
 }
 
 module.exports = allowCors(handler);
