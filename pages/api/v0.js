@@ -21,17 +21,15 @@ const allowCors = (fn) => async (req, res) => {
   return await fn(req, res);
 };
 
-function maybeParse(text) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return Papa.parse(text, { header: true, skipEmptyLines: true }).data;
-  }
+function makeFetchErrorMsg(isMulti, idx) {
+  return `fetch failed: check that ${
+    isMulti ? (idx !== undefined ? `url[${idx}]` : 'each url') : 'url'
+  } is valid and properly encoded.`;
 }
 
 async function handler(req, res) {
-  const fail = (error) => {
-    res.status(500).json({ error, query: req.query });
+  const fail = (error, code = 500) => {
+    res.status(code).json({ error, query: req.query });
   };
 
   const { url, jq: filter, debug } = req.query;
@@ -41,44 +39,61 @@ async function handler(req, res) {
     missingParams.push('url');
   }
   if (missingParams.length > 0) {
-    return fail(`missing query parameters: [${missingParams.join(', ')}]`);
+    return fail(`missing query parameters: [${missingParams.join(', ')}]`, 400);
   }
 
-  let text;
+  const urls = Array.isArray(url) ? url : [url];
+  const isMulti = urls.length > 1;
+
+  let texts;
   try {
-    const fetched = await fetch(url);
-    text = await fetched.text();
+    const fetched = await Promise.all(urls.map((u) => fetch(u)));
+
+    fetched.forEach((f, idx) => {
+      if (f.status < 200 || f.status >= 400) {
+        return fail(makeFetchErrorMsg(isMulti, idx));
+      }
+    });
+
+    texts = await Promise.all(fetched.map((f) => f.text()));
   } catch {
-    return fail('fetch failed: check that URL is valid and properly encoded.');
+    return fail(makeFetchErrorMsg(isMulti));
   }
 
-  let json;
-  try {
-    json = maybeParse(text);
-  } catch {
-    return fail(
-      'parse failed: check that original response is valid JSON or CSV.',
-    );
-  }
-
-  if (filter) {
+  function maybeParse(text, idx) {
     try {
-      json = await jq.run(filter, json, {
-        input: 'json',
-        output: 'json',
-      });
+      try {
+        return JSON.parse(text);
+      } catch {
+        return Papa.parse(text, { header: true, skipEmptyLines: true }).data;
+      }
     } catch {
       return fail(
-        'node-jq failed: check that filter expression is valid and properly encoded.',
+        `parse failed: check that response from ${
+          isMulti ? `url[${idx}]` : 'url'
+        } is valid JSON or CSV.`,
       );
     }
   }
 
+  let inputJsons;
+  inputJsons = texts.map(maybeParse);
+
+  let output;
+  try {
+    output = await jq.run(filter ?? '.', isMulti ? inputJsons : inputJsons[0], {
+      input: 'json',
+      output: 'json',
+    });
+  } catch {
+    return fail(
+      'node-jq failed: check that filter expression is valid and properly encoded.',
+    );
+  }
+
   return res
     .status(200)
-    .json(
-      debug === 'true' ? { version, query: req.query, output: json } : json,
-    );
+    .json(debug === 'true' ? { version, query: req.query, output } : output);
 }
 
 module.exports = allowCors(handler);
