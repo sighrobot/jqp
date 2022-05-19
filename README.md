@@ -1,6 +1,6 @@
 # jqp ![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square)
 
-[**jqp** is a free serverless proxy](https://jqp.vercel.app/api/v0) that lets you request data from a third-party source, filter it using [node-jq](https://github.com/sanack/node-jq), and receive the filtered response.
+[**jqp** is a free serverless proxy](https://jqp.vercel.app/api/v0) that lets you request data from remote sources, filter it using [node-jq](https://github.com/sanack/node-jq), and receive the filtered response.
 
 ## How to use
 
@@ -10,9 +10,11 @@
 | `jq`        | a URL-encoded filter expression supported by node-jq                                                                                                                              |          |
 | `debug`     | `true` returns a nested response object that includes the values of the passed params above                                                                                       |
 
-jqp will first attempt to parse JSON from the response body. If this fails, it will assume that the response body is a CSV and attempt to parse it into JSON.
+jqp will first assume that the response body is JSON. If parsing fails, it will assume that the response body is CSV and attempt to parse it into JSON.
 
 > Note: _Each row of CSV data will be parsed into an object of values keyed by field name._
+
+> Note: _To fetch multiple files, the `url` parameter can be used more than once. The responses are made available to node-jq as an array, and can be referenced in the same order as their respective `url` parameters, e.g. `.[0]`, `.[1]`, etc._
 
 ## Examples
 
