@@ -1,4 +1,4 @@
-# jqp ![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square)
+# jqp ![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square) [![Mentioned in Awesome jq](https://awesome.re/mentioned-badge.svg)](https://github.com/fiatjaf/awesome-jq)
 
 [**jqp** is a free serverless proxy](https://jqp.vercel.app/api/v0) that lets you request data from remote sources, filter it using [node-jq](https://github.com/sanack/node-jq), and receive the filtered response.
 

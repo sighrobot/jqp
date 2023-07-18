@@ -1,0 +1,61 @@
+.main {
+  font-family: monospace;
+  font-size: 17px;
+  margin: 0 auto;
+  max-width: 1200px;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  header {
+    margin-bottom: 40px;
+
+    h1 {
+      margin: 0;
+      margin-bottom: 10px;
+    }
+
+    div > * {
+      margin-right: 10px;
+    }
+  }
+
+  fieldset {
+    padding: 20px 10px 5px 10px;
+    width: 100%;
+
+    button {
+      font-family: inherit;
+      font-size: inherit;
+      width: 108px;
+      margin-left: 10px;
+    }
+  }
+
+  .inputButtonLockup {
+    display: flex;
+    margin-bottom: 10px;
+
+    input {
+      flex-grow: 1;
+      font-family: inherit;
+      font-size: inherit;
+      padding: 5px;
+    }
+  }
+
+  textarea {
+    font-size: inherit;
+    min-height: 20vh;
+    padding: 5px;
+    resize: vertical;
+    width: 100%;
+  }
+
+  .arrow {
+    font-size: 32px;
+    margin: 5px 0;
+    text-align: center;
+  }
+}

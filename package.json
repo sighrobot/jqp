@@ -7,11 +7,13 @@
   "author": "Abe Rubenstein <sighrobot@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "jq-web": "^0.5.1",
     "next": "13.4.10",
     "node-jq": "2.3.5",
     "papaparse": "5.4.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "sass": "1.63.6"
   },
   "scripts": {
     "dev": "next dev",
