@@ -1,7 +1,7 @@
 {
   "name": "jqp",
   "description": "A free serverless proxy for filtering remote JSON and CSV files using node-jq",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "homepage": "https://github.com/sighrobot/jqp",
   "repository": "git@github.com:sighrobot/jqp.git",
   "author": "Abe Rubenstein <sighrobot@gmail.com>",
