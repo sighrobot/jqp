@@ -1,24 +1,13 @@
-const jq = require('jq-web');
-const Papa = require('papaparse');
+import { NextResponse } from 'next/server';
+import jq from 'jq-web';
+import Papa from 'papaparse';
 
-const { version } = require('../../package.json');
+const { version } = require('../../../package.json');
 
-const allowCors = (fn) => async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-  );
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-  );
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  return await fn(req, res);
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 function makeFetchErrorMsg(isMulti, idx) {
@@ -27,12 +16,16 @@ function makeFetchErrorMsg(isMulti, idx) {
   } is valid and properly encoded.`;
 }
 
-async function handler(req, res) {
-  const fail = (error, code = 500) => {
-    res.status(code).json({ error, query: req.query });
-  };
+export async function GET(req) {
+  const query = Object.fromEntries(req.nextUrl.searchParams);
 
-  const { url, jq: filter, debug } = req.query;
+  const fail = (error, code = 500) =>
+    NextResponse.json(
+      { error, query },
+      { status: code, headers: CORS_HEADERS },
+    );
+
+  const { url, jq: filter, debug } = query;
 
   const missingParams = [];
   if (!url) {
@@ -89,9 +82,8 @@ async function handler(req, res) {
     return fail(e.stack.replace(/\n/g, ' '));
   }
 
-  return res
-    .status(200)
-    .json(debug === 'true' ? { version, query: req.query, output } : output);
+  return NextResponse.json(
+    debug === 'true' ? { version, query, output } : output,
+    { status: 200, headers: CORS_HEADERS },
+  );
 }
-
-module.exports = allowCors(handler);
