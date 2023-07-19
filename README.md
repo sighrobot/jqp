@@ -1,20 +1,20 @@
 # jqp ![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square) [![Mentioned in Awesome jq](https://awesome.re/mentioned-badge.svg)](https://github.com/fiatjaf/awesome-jq)
 
-[**jqp** is a free serverless proxy](https://jqp.vercel.app/api/v0) that lets you request data from remote sources, filter it using [node-jq](https://github.com/sanack/node-jq), and receive the filtered response.
+[**jqp** is a free serverless proxy](https://jqp.vercel.app/api/v0) that lets you request data from remote sources, filter it using [jq-web](https://github.com/fiatjaf/jq-web), and receive the filtered response.
 
 ## How to use
 
 | Query param | Description                                                                                                                                                                       | Required |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
 | `url`       | a [URL-encoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) URL (🤯) for a publicly accessible JSON endpoint or CSV file |    ✔️    |
-| `jq`        | a URL-encoded filter expression supported by node-jq                                                                                                                              |          |
+| `jq`        | a URL-encoded filter expression supported by jq-web                                                                                                                               |          |
 | `debug`     | `true` returns a nested response object that includes the values of the passed params above                                                                                       |
 
 jqp will first assume that the response body is JSON. If parsing fails, it will assume that the response body is CSV and attempt to parse it into JSON.
 
 > Note: _Each row of CSV data will be parsed into an object of values keyed by field name._
 
-> Note: _To fetch multiple files, the `url` parameter can be used more than once. The responses are made available to node-jq as an array, and can be referenced in the same order as their respective `url` parameters, e.g. `.[0]`, `.[1]`, etc._
+> Note: _To fetch multiple files, the `url` parameter can be used more than once. The responses are made available to jq-web as an array, and can be referenced in the same order as their respective `url` parameters, e.g. `.[0]`, `.[1]`, etc._
 
 ## Examples
 

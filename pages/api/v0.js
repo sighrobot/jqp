@@ -1,4 +1,4 @@
-const jq = require('node-jq');
+const jq = require('jq-web');
 const Papa = require('papaparse');
 
 const { version } = require('../../package.json');
@@ -81,14 +81,12 @@ async function handler(req, res) {
 
   let output;
   try {
-    output = await jq.run(filter ?? '.', isMulti ? inputJsons : inputJsons[0], {
-      input: 'json',
-      output: 'json',
-    });
-  } catch {
-    return fail(
-      'node-jq failed: check that filter expression is valid and properly encoded.',
+    output = await jq.promised.json(
+      isMulti ? inputJsons : inputJsons[0],
+      filter ?? '.',
     );
+  } catch (e) {
+    return fail(e.stack.replace(/\n/g, ' '));
   }
 
   return res
