@@ -1,23 +1,25 @@
-import React from "react";
-import Link from "next/link";
-import jq from "jq-web";
+'use client';
 
-import style from "./style.module.scss";
+import React from 'react';
+import Link from 'next/link';
+import jq from 'jq-web';
+
+import style from './style.module.scss';
 
 const exampleUrl =
-  "https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json";
-const exampleJq = "[.[] | {name: .name.english, hp: .base.HP}]";
+  'https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json';
+const exampleJq = '[.[] | {name: .name.english, hp: .base.HP}]';
 
 const Arrow = <div className={style.arrow}>&darr;</div>;
 
-export default function Index() {
+export default function Page() {
   const [state, setState] = React.useState({
     url: exampleUrl,
-    rawJsonString: "",
+    rawJsonString: '',
     jq: exampleJq,
-    jqError: "",
-    transformedJsonString: "",
-    jqpUrl: "",
+    jqError: '',
+    transformedJsonString: '',
+    jqpUrl: '',
   });
 
   const handleChangeInputValue = (e) =>
@@ -36,7 +38,7 @@ export default function Index() {
     const searchParams = new URLSearchParams({ url: state.url, jq: state.jq });
     const url = `${location.href}api/v0?${searchParams}`;
     let isError = false;
-    let text = "";
+    let text = '';
     try {
       text = await jq.promised.raw(state.rawJsonString, state.jq);
     } catch (e) {
@@ -46,9 +48,9 @@ export default function Index() {
 
     setState((s) => ({
       ...s,
-      transformedJsonString: isError ? "" : text,
-      jqError: isError ? text : "",
-      jqpUrl: isError ? "" : url,
+      transformedJsonString: isError ? '' : text,
+      jqError: isError ? text : '',
+      jqpUrl: isError ? '' : url,
     }));
   };
 
@@ -59,29 +61,29 @@ export default function Index() {
       <header>
         <h1>jqp Playground</h1>
         <div>
-          <Link href="https://github.com/sighrobot/jqp" target="_blank">
-            <img src="https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square" />
+          <Link href='https://github.com/sighrobot/jqp' target='_blank'>
+            <img src='https://img.shields.io/github/package-json/v/sighrobot/jqp?color=royalblue&style=flat-square' />
           </Link>
 
           <Link
-            href="https://github.com/fiatjaf/awesome-jq#web"
-            target="_blank"
+            href='https://github.com/fiatjaf/awesome-jq#web'
+            target='_blank'
           >
             <img
-              src="https://awesome.re/mentioned-badge.svg"
-              title="Mentioned in Awesome jq"
+              src='https://awesome.re/mentioned-badge.svg'
+              title='Mentioned in Awesome jq'
             />
           </Link>
         </div>
       </header>
 
-      <fieldset style={{ background: "#fef" }}>
+      <fieldset style={{ background: '#fef' }}>
         <form className={style.inputButtonLockup} onSubmit={loadRawResponse}>
           <input
-            name="url"
+            name='url'
             onChange={handleChangeInputValue}
-            pattern="https?://.+"
-            placeholder="Enter data source URL"
+            pattern='https?://.+'
+            placeholder='Enter data source URL'
             value={state.url}
           />
           <button disabled={!state.url}>Fetch</button>
@@ -99,7 +101,7 @@ export default function Index() {
 
       {Arrow}
 
-      <fieldset style={{ background: "#eef" }}>
+      <fieldset style={{ background: '#eef' }}>
         <form
           className={style.inputButtonLockup}
           onSubmit={loadTransformedResponse}
@@ -107,9 +109,9 @@ export default function Index() {
           <input
             className={style.jq}
             disabled={!state.rawJsonString}
-            name="jq"
+            name='jq'
             onChange={handleChangeInputValue}
-            placeholder="Enter jq filter (optional)"
+            placeholder='Enter jq filter (optional)'
             value={state.jq}
           />
           <button>Transform</button>
@@ -131,10 +133,10 @@ export default function Index() {
 
       <fieldset
         disabled={!state.transformedJsonString}
-        style={{ background: "#efe" }}
+        style={{ background: '#efe' }}
       >
         <div className={style.inputButtonLockup}>
-          <input readOnly type="url" value={state.jqpUrl} />
+          <input readOnly type='url' value={state.jqpUrl} />
           <button onClick={handleCopyJqpUrl}>Copy</button>
         </div>
 
